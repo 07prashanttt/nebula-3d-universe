@@ -111,3 +111,41 @@ h1 { font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 1px; 
 .planet-dock button:hover, .planet-dock button.active {
   background: #38bdf8; color: #020617; border-color: #38bdf8;
 }
+
+/* MOBILE PLANET INFO CARD FIX */
+@media (max-width: 600px) {
+  .info-card:not(.hidden) {
+    position: fixed !important;
+    top: auto !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 125px !important;
+
+    width: auto !important;
+    max-width: 360px !important;
+    max-height: 175px !important;
+
+    margin: 0 auto !important;
+    padding: 14px !important;
+    overflow-y: auto !important;
+
+    z-index: 100 !important;
+  }
+
+  .info-card .card-desc {
+    font-size: 12px !important;
+    margin: 6px 0 !important;
+  }
+
+  .info-card .stats-grid {
+    gap: 6px !important;
+  }
+
+  .info-card .stat {
+    padding: 8px !important;
+  }
+
+  .info-card .card-head h2 {
+    font-size: 20px !important;
+  }
+}
