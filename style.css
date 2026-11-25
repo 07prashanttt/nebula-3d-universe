@@ -1,33 +1,130 @@
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
-body { overflow: hidden; background: #000; color: #f8fafc; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', system-ui, sans-serif; }
+body { overflow: hidden; background: #000; color: #f8fafc; user-select: none; }
 
-.hud {
-  position: fixed; top: 18px; left: 20px; z-index: 20; max-width: 340px;
-  background: rgba(3, 7, 18, 0.78); padding: 15px 18px; border-radius: 16px;
-  border: 1px solid rgba(56, 189, 248, 0.35); backdrop-filter: blur(12px);
-}
-h1 { font-size: 16px; letter-spacing: 1.8px; color: #38bdf8; }
-p { font-size: 12px; color: #cbd5e1; margin-top: 6px; line-height: 1.45; }
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 15; }
 
-.actions { display: flex; gap: 8px; margin-top: 12px; }
-.actions button {
-  padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(30, 41, 59, 0.9); color: #f8fafc; font-size: 12px; font-weight: 700; cursor: pointer;
+/* Top-Right AI Creator Badge: PRASHANT MAXX */
+.creator-tag {
+  position: fixed; top: 18px; right: 18px; z-index: 25;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 9px 15px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.86), rgba(30, 27, 75, 0.78));
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.18);
+  backdrop-filter: blur(14px);
 }
-.actions button:hover { background: #38bdf8; color: #020617; }
 
-.dock {
-  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 7px;
-  z-index: 20; max-width: 96vw; background: rgba(3, 7, 18, 0.82);
-  padding: 10px 14px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(12px);
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px #818cf8;
+  animation: pulseGlow 2s infinite ease-in-out;
 }
-.dock button {
-  padding: 6px 13px; border-radius: 99px; border: 1px solid #334155;
-  background: #0f172a; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;
-  transition: 0.2s;
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.65; }
 }
-.dock button:hover, .dock button.active {
+
+.creator-text { display: flex; flex-direction: column; line-height: 1.15; }
+
+.ai-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8.5px; font-weight: 700; letter-spacing: 2px;
+  color: #93c5fd;
+}
+
+.creator-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px; font-weight: 900; letter-spacing: 1.6px;
+  background: linear-gradient(90deg, #ffffff, #38bdf8 55%, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.top-panel {
+  position: fixed; top: 18px; left: 18px; width: 320px; max-width: calc(100vw - 36px);
+  pointer-events: auto;
+  background: rgba(4, 9, 22, 0.76); backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.32); border-radius: 18px;
+  padding: 16px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+}
+
+.brand-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.badge { font-size: 10px; letter-spacing: 2px; color: #38bdf8; font-weight: 800; }
+h1 { font-family: 'Orbitron', sans-serif; font-size: 19px; letter-spacing: 1.5px; margin-top: 3px; }
+.hint { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25); background: rgba(15, 23, 42, 0.85);
+  color: #fff; cursor: pointer; font-size: 15px;
+}
+.icon-btn:hover { border-color: #38bdf8; }
+
+.controls-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px;
+}
+.controls-grid button {
+  padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(15, 23, 42, 0.88); color: #f1f5f9; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: 0.18s;
+}
+.controls-grid button:hover { background: #38bdf8; color: #020617; border-color: #38bdf8; }
+
+.slider-row { margin-top: 12px; }
+.slider-row label { display: flex; justify-content: space-between; font-size: 12px; color: #cbd5e1; margin-bottom: 6px; }
+.slider-row input { width: 100%; accent-color: #38bdf8; cursor: pointer; }
+
+.info-card {
+  position: fixed; top: 76px; right: 18px; width: 300px; max-width: calc(100vw - 36px);
+  pointer-events: auto;
+  background: rgba(4, 9, 22, 0.82); backdrop-filter: blur(14px);
+  border: 1px solid rgba(129, 140, 248, 0.4); border-radius: 18px;
+  padding: 16px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.info-card.hidden { opacity: 0; pointer-events: none; transform: translateY(-8px); }
+
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.sub-tag { font-size: 10px; letter-spacing: 2px; color: #a5b4fc; font-weight: 800; }
+.card-head h2 { font-family: 'Orbitron', sans-serif; font-size: 20px; margin-top: 3px; }
+.close-btn {
+  width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: rgba(255, 255, 255, 0.1); color: #fff; cursor: pointer; font-weight: 700;
+}
+.close-btn:hover { background: #ef4444; }
+.card-desc { font-size: 12.5px; color: #cbd5e1; line-height: 1.5; margin: 10px 0 12px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.stat {
+  background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px; padding: 9px 10px;
+}
+.stat span { display: block; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; }
+.stat b { display: block; font-size: 13px; color: #38bdf8; margin-top: 3px; }
+
+.planet-dock {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  max-width: 96vw; padding: 9px 13px; border-radius: 999px;
+  background: rgba(4, 9, 22, 0.84); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.planet-dock button {
+  padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.9); color: #e2e8f0; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: 0.18s;
+}
+.planet-dock button:hover, .planet-dock button.active {
   background: #38bdf8; color: #020617; border-color: #38bdf8;
+}
+
+@media (max-width: 640px) {
+  .creator-tag {
+    top: auto; bottom: 74px; right: 14px;
+    padding: 7px 12px;
+  }
+  .creator-name { font-size: 11.5px; }
+  .info-card { top: auto; bottom: 120px; right: 18px; }
 }
