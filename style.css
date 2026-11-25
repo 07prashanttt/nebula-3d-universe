@@ -149,3 +149,8 @@ h1 { font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 1px; 
     font-size: 20px !important;
   }
 }
+
+/* REMOVE PLANET INFO CARD */
+#infoCard {
+  display: none !important;
+}
