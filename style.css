@@ -1,24 +1,33 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
-body { overflow: hidden; background: #000; color: #fff; }
+body { overflow: hidden; background: #000; color: #f8fafc; }
+
 .hud {
-  position: fixed; top: 18px; left: 20px; z-index: 10;
-  background: rgba(5, 10, 24, 0.72); padding: 14px 20px; border-radius: 16px;
-  border: 1px solid rgba(56, 189, 248, 0.35); backdrop-filter: blur(10px);
+  position: fixed; top: 18px; left: 20px; z-index: 20; max-width: 340px;
+  background: rgba(3, 7, 18, 0.78); padding: 15px 18px; border-radius: 16px;
+  border: 1px solid rgba(56, 189, 248, 0.35); backdrop-filter: blur(12px);
 }
-h1 { font-size: 17px; letter-spacing: 2px; color: #38bdf8; }
-p { font-size: 12px; color: #cbd5e1; margin-top: 4px; }
-.planet-bar {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-  z-index: 10; max-width: 95vw; background: rgba(5, 10, 24, 0.78);
-  padding: 10px 14px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+h1 { font-size: 16px; letter-spacing: 1.8px; color: #38bdf8; }
+p { font-size: 12px; color: #cbd5e1; margin-top: 6px; line-height: 1.45; }
+
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions button {
+  padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(30, 41, 59, 0.9); color: #f8fafc; font-size: 12px; font-weight: 700; cursor: pointer;
 }
-.planet-bar button {
+.actions button:hover { background: #38bdf8; color: #020617; }
+
+.dock {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 7px;
+  z-index: 20; max-width: 96vw; background: rgba(3, 7, 18, 0.82);
+  padding: 10px 14px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+}
+.dock button {
   padding: 6px 13px; border-radius: 99px; border: 1px solid #334155;
   background: #0f172a; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;
   transition: 0.2s;
 }
-.planet-bar button:hover, .planet-bar button.active {
+.dock button:hover, .dock button.active {
   background: #38bdf8; color: #020617; border-color: #38bdf8;
 }
