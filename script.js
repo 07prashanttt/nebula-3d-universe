@@ -157,6 +157,31 @@ function makeTexture(kind) {
   return new THREE.CanvasTexture(canvas);
 }
 
+// Helper to build a mini 3D satellite with solar panels + glowing beacon
+function createSatelliteMesh(beaconColor = 0x38bdf8, panelColor = 0x1d4ed8, scale = 1) {
+  const sat = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.08 * scale, 0.08 * scale, 0.24 * scale, 12),
+    new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.7, roughness: 0.25 })
+  );
+  body.rotation.z = Math.PI / 2;
+
+  const panelMat = new THREE.MeshStandardMaterial({ color: panelColor, metalness: 0.4, roughness: 0.3 });
+  const leftPanel = new THREE.Mesh(new THREE.BoxGeometry(0.18 * scale, 0.015 * scale, 0.42 * scale), panelMat);
+  leftPanel.position.x = -0.22 * scale;
+  const rightPanel = new THREE.Mesh(new THREE.BoxGeometry(0.18 * scale, 0.015 * scale, 0.42 * scale), panelMat);
+  rightPanel.position.x = 0.22 * scale;
+
+  const beacon = new THREE.Mesh(
+    new THREE.SphereGeometry(0.055 * scale, 10, 10),
+    new THREE.MeshBasicMaterial({ color: beaconColor })
+  );
+  beacon.position.y = 0.1 * scale;
+
+  sat.add(body, leftPanel, rightPanel, beacon);
+  return sat;
+}
+
 // Multi-color Starfield
 const starGeo = new THREE.BufferGeometry();
 const starPos = new Float32Array(7500 * 3);
@@ -188,7 +213,7 @@ scene.add(new THREE.AmbientLight(0x1e293b, 0.85));
 const planetData = [
   { key: 'mercury', name: 'Mercury', type: 'TERRESTRIAL', r: 1.15, dist: 16, speed: 0.018, distTxt: '57.9M km', gravTxt: '3.7 m/s²', tempTxt: '167°C', moonsTxt: '0', desc: 'Smallest, innermost planet with heavily cratered silicate terrain.' },
   { key: 'venus',   name: 'Venus',   type: 'TERRESTRIAL', r: 1.85, dist: 23, speed: 0.013, distTxt: '108.2M km', gravTxt: '8.87 m/s²', tempTxt: '464°C', moonsTxt: '0', desc: 'Shrouded in thick sulfuric acid clouds with runaway greenhouse heat.' },
-  { key: 'earth',   name: 'Earth',   type: 'OCEAN WORLD', r: 2.25, dist: 32, speed: 0.010, distTxt: '149.6M km', gravTxt: '9.81 m/s²', tempTxt: '15°C', moonsTxt: '1 + ISS', desc: 'Liquid water oceans, dynamic weather clouds, city lights, Moon & ISS.', earthExtras: true },
+  { key: 'earth',   name: 'Earth',   type: 'OCEAN WORLD', r: 2.25, dist: 32, speed: 0.010, distTxt: '149.6M km', gravTxt: '9.81 m/s²', tempTxt: '15°C', moonsTxt: '1 + 6 Sats', desc: 'Liquid water oceans, clouds, city lights, Moon, ISS & 6 orbiting satellites.', earthExtras: true },
   { key: 'mars',    name: 'Mars',    type: 'TERRESTRIAL', r: 1.55, dist: 41, speed: 0.008, distTxt: '227.9M km', gravTxt: '3.72 m/s²', tempTxt: '-65°C', moonsTxt: '2', desc: 'Iron-oxide desert world home to Olympus Mons and vast canyons.' },
   { key: 'jupiter', name: 'Jupiter', type: 'GAS GIANT',   r: 4.8,  dist: 57, speed: 0.0055, distTxt: '778.5M km', gravTxt: '24.79 m/s²', tempTxt: '-110°C', moonsTxt: '95 (4 shown)', desc: 'Massive hydrogen-helium giant with banded storms and Galilean moons.', jupiterMoons: true },
   { key: 'saturn',  name: 'Saturn',  type: 'GAS GIANT',   r: 3.9,  dist: 75, speed: 0.004, distTxt: '1.43B km', gravTxt: '10.44 m/s²', tempTxt: '-140°C', moonsTxt: '146', desc: 'Adorned with bright icy rings made of billions of ring particles.', saturnRings: true },
@@ -206,7 +231,7 @@ const planets = planetData.map(cfg => {
   mesh.userData.planetCfg = cfg;
   clickableMeshes.push(mesh);
 
-  let clouds = null, moon = null, iss = null, moonsList = [];
+  let clouds = null, moon = null, satellitesList = [], moonsList = [];
 
   if (cfg.earthExtras) {
     clouds = new THREE.Mesh(
@@ -227,11 +252,22 @@ const planets = planetData.map(cfg => {
       new THREE.SphereGeometry(0.55, 24, 24),
       new THREE.MeshStandardMaterial({ map: makeTexture('moon'), bumpMap: makeTexture('moon'), bumpScale: 0.05, roughness: 0.9 })
     );
-    iss = new THREE.Mesh(
-      new THREE.BoxGeometry(0.24, 0.08, 0.12),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
-    );
-    scene.add(moon, iss);
+    scene.add(moon);
+
+    // ISS + 5 Additional Satellites in varied 3D orbital planes
+    const satSpecs = [
+      { orbR: 2.75, speed: 0.11,  incl: 0.45,  phase: 0.2, beacon: 0x38bdf8, panel: 0x0284c7, scale: 1.25 },
+      { orbR: 2.95, speed: -0.09, incl: -0.75, phase: 1.4, beacon: 0x4ade80, panel: 0x1e3a8a, scale: 0.95 },
+      { orbR: 3.12, speed: 0.075, incl: 1.15,  phase: 2.3, beacon: 0xfacc15, panel: 0x1d4ed8, scale: 0.9  },
+      { orbR: 3.25, speed: 0.065, incl: -0.35, phase: 3.4, beacon: 0xf472b6, panel: 0x2563eb, scale: 0.85 },
+      { orbR: 3.42, speed: -0.055,incl: 0.9,   phase: 4.5, beacon: 0x22d3ee, panel: 0x1e40af, scale: 0.95 },
+      { orbR: 3.58, speed: 0.05,  incl: -1.1,  phase: 5.5, beacon: 0xfb923c, panel: 0x1d4ed8, scale: 0.85 }
+    ];
+    satSpecs.forEach(sp => {
+      const satMesh = createSatelliteMesh(sp.beacon, sp.panel, sp.scale);
+      scene.add(satMesh);
+      satellitesList.push({ mesh: satMesh, ...sp, angle: sp.phase });
+    });
   }
 
   if (cfg.jupiterMoons) {
@@ -266,7 +302,7 @@ const planets = planetData.map(cfg => {
   orbitRing.rotation.x = Math.PI / 2;
   scene.add(orbitRing, mesh);
 
-  return { ...cfg, mesh, clouds, moon, iss, moonsList, angle: Math.random() * Math.PI * 2, moonAngle: 0, issAngle: 1.2 };
+  return { ...cfg, mesh, clouds, moon, satellitesList, moonsList, angle: Math.random() * Math.PI * 2, moonAngle: 0 };
 });
 
 // Asteroid Belt
@@ -371,6 +407,7 @@ renderer.domElement.addEventListener('pointerup', e => {
 function animate() {
   requestAnimationFrame(animate);
   const step = paused ? 0 : speedMult;
+  const activeStep = step || 0.35;
 
   sun.rotation.y += 0.0025 * (step || 0.2);
   sunCorona.scale.setScalar(1 + Math.sin(performance.now() * 0.003) * 0.025);
@@ -391,15 +428,23 @@ function animate() {
       );
       p.moon.rotation.y += 0.01;
     }
-    if (p.iss) {
-      p.issAngle += 0.11 * (step || 0.4);
-      p.iss.position.set(
-        p.mesh.position.x + Math.cos(p.issAngle) * 2.85,
-        Math.cos(p.issAngle) * 0.65,
-        p.mesh.position.z + Math.sin(p.issAngle) * 2.85
-      );
-      p.iss.rotation.y = -p.issAngle;
+
+    if (p.satellitesList && p.satellitesList.length) {
+      p.satellitesList.forEach(s => {
+        s.angle += s.speed * activeStep;
+        const xLocal = Math.cos(s.angle) * s.orbR;
+        const zLocal = Math.sin(s.angle) * s.orbR;
+        const yTilted = zLocal * Math.sin(s.incl);
+        const zTilted = zLocal * Math.cos(s.incl);
+        s.mesh.position.set(
+          p.mesh.position.x + xLocal,
+          p.mesh.position.y + yTilted,
+          p.mesh.position.z + zTilted
+        );
+        s.mesh.lookAt(p.mesh.position);
+      });
     }
+
     if (p.moonsList.length) {
       p.moonsList.forEach(m => {
         m.angle += m.speed * step;
