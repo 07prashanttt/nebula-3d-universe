@@ -1,14 +1,54 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aetheris 3D — PRASHANT MAXX</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    #cartoonVoiceBtn {
+      position: fixed;
+      bottom: 22px;
+      right: 18px;
+      z-index: 99999;
+      background: linear-gradient(135deg,#7c3aed,#2563eb);
+      color: white;
+      border: 1px solid #a78bfa;
+      border-radius: 30px;
+      padding: 13px 17px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #7c3aed88;
+    }
+
+    #cartoonVoiceBtn:active {
+      transform: scale(.95);
+    }
+
+    #voiceCaption {
+      position: fixed;
+      bottom: 78px;
+      right: 18px;
+      z-index: 99999;
+      max-width: 260px;
+      padding: 10px 14px;
+      color: white;
+      background: #100d27eF;
+      border: 1px solid #8b5cf6;
+      border-radius: 14px;
+      font-size: 13px;
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
   <div id="hud">
     <div class="creator-tag">
@@ -25,7 +65,8 @@
           <span class="badge">SPACE SIM 3D</span>
           <h1>AETHERIS 3D</h1>
         </div>
-        <button class="icon-btn" id="soundBtn" title="Sound" onclick="toggleSound()">🔊</button>
+        <button class="icon-btn" id="soundBtn"
+          title="Sound" onclick="toggleSound()">🔊</button>
       </div>
 
       <div class="controls-grid">
@@ -37,7 +78,9 @@
 
       <div class="slider-row">
         <label for="speedSlider">Speed: <b id="speedVal">1.0x</b></label>
-        <input id="speedSlider" type="range" min="0" max="4" step="0.1" value="1" oninput="updateSpeed(this.value)" />
+        <input id="speedSlider" type="range"
+          min="0" max="4" step="0.1" value="1"
+          oninput="updateSpeed(this.value)" />
       </div>
     </div>
 
@@ -49,7 +92,9 @@
         </div>
         <button class="close-btn" onclick="resetCamera()">✕</button>
       </div>
+
       <p class="card-desc" id="cardDesc"></p>
+
       <div class="stats-grid">
         <div class="stat"><span>Distance</span><b id="statDist">—</b></div>
         <div class="stat"><span>Gravity</span><b id="statGrav">—</b></div>
@@ -61,8 +106,187 @@
 
   <nav class="planet-dock" id="planetDock"></nav>
 
+  <div id="voiceCaption"></div>
+
+  <button id="cartoonVoiceBtn">🔊 Cartoon Voice ON</button>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
+
+  <script>
+  (() => {
+    let voiceEnabled = true;
+    let welcomed = false;
+    let voices = [];
+    let lastPlanet = "";
+    let speedTimer;
+
+    const voiceButton = document.getElementById("cartoonVoiceBtn");
+    const caption = document.getElementById("voiceCaption");
+
+    const dialogues = {
+      welcome: [
+        "Areyyy dosto! Welcome to Aetheris 3D! Chalo universe ki sair karte hain!",
+        "Ohoho! Itna bada universe! Aaj toh full masti hone wali hai!"
+      ],
+      pause: [
+        "Arey bhai! Thoda aaram kar lete hain!",
+        "Hehehe! Space mein bhi break chahiye!"
+      ],
+      resume: [
+        "Chalo chalo! Adventure dobara shuru!",
+        "Yayyy! Ab phir se space mein ghoomte hain!"
+      ],
+      top: [
+        "Oho! Upar se dekho, kitna mast nazara hai!",
+        "Wah! Poori galaxy ek saath dikh rahi hai!"
+      ],
+      reset: [
+        "Arey baap re! Wapas starting point par aa gaye!",
+        "Chalo bhai! Nayi journey shuru karte hain!"
+      ],
+      snap: [
+        "Smile please! Space wali photo khinch gayi!",
+        "Oye hoye! Kya mast picture hai!"
+      ],
+      sound: [
+        "Hehehe! Sound ka maza lo!",
+        "Oye! Music on karo aur enjoy karo!"
+      ],
+      speed: [
+        "Arey itni speed! Rocket bana diya kya?",
+        "Wooooow! Universe mein full speed!"
+      ]
+    };
+
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+    }
+
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function randomLine(type) {
+      const lines = dialogues[type];
+      return lines[Math.floor(Math.random() * lines.length)];
+    }
+
+    function say(message) {
+      if (!voiceEnabled || !("speechSynthesis" in window)) return;
+
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = "hi-IN";
+      utterance.pitch = 1.9;
+      utterance.rate = 1.12;
+      utterance.volume = 1;
+
+      const hindiVoice = voices.find(v =>
+        v.lang.toLowerCase().startsWith("hi")
+      );
+
+      if (hindiVoice) utterance.voice = hindiVoice;
+
+      caption.textContent = "🤪 " + message;
+      caption.style.display = "block";
+
+      utterance.onend = () => {
+        caption.style.display = "none";
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function welcome() {
+      if (welcomed) return;
+      welcomed = true;
+      say(randomLine("welcome"));
+    }
+
+    voiceButton.addEventListener("click", () => {
+      voiceEnabled = !voiceEnabled;
+
+      if (!voiceEnabled) {
+        speechSynthesis.cancel();
+        caption.style.display = "none";
+        voiceButton.textContent = "🔇 Cartoon Voice OFF";
+      } else {
+        voiceButton.textContent = "🔊 Cartoon Voice ON";
+        welcome();
+      }
+    });
+
+    // Welcome on first user interaction
+    document.addEventListener("pointerdown", () => {
+      if (!welcomed && voiceEnabled) welcome();
+    }, { once: true });
+
+    // Existing game buttons
+    document.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button || button === voiceButton) return;
+
+      if (button.id === "pauseBtn") {
+        const paused = button.textContent.toLowerCase().includes("resume");
+        say(randomLine(paused ? "resume" : "pause"));
+        return;
+      }
+
+      if (button.id === "soundBtn") {
+        say(randomLine("sound"));
+        return;
+      }
+
+      const text = button.textContent.toLowerCase();
+
+      if (text.includes("top")) {
+        say(randomLine("top"));
+      } else if (text.includes("reset") || text.includes("✕")) {
+        say(randomLine("reset"));
+      } else if (text.includes("snap")) {
+        say(randomLine("snap"));
+      }
+    });
+
+    // Speed control
+    document.getElementById("speedSlider").addEventListener("change", event => {
+      clearTimeout(speedTimer);
+      say(randomLine("speed"));
+    });
+
+    // Planet selection: detect changes to the information card
+    const planetName = document.getElementById("cardName");
+
+    const observer = new MutationObserver(() => {
+      const name = planetName.textContent.trim();
+
+      if (!name || name === lastPlanet) return;
+
+      lastPlanet = name;
+
+      const lines = [
+        "Oye hoye! Hum pahunch gaye " + name + " par! Kya mast jagah hai!",
+        "Arey wah! Ye hai " + name + "! Iske baare mein aur jaanenge!",
+        "Hehehe! " + name + " mil gaya! Space adventure jaari hai!"
+      ];
+
+      say(lines[Math.floor(Math.random() * lines.length)]);
+    });
+
+    observer.observe(planetName, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+
+    // Reset planet tracking when the card is closed
+    document.querySelector(".close-btn").addEventListener("click", () => {
+      lastPlanet = "";
+    });
+
+  })();
+  </script>
 </body>
 </html>
