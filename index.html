@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nebula 3D Universe</title>
+  <title>Realistic 3D Solar System</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="hud">
-    <h1>NEBULA 3D UNIVERSE</h1>
-    <p>Drag to Rotate • Scroll to Zoom</p>
+    <h1>SOLAR SYSTEM 3D</h1>
+    <p id="planetInfo">Drag to Rotate • Scroll to Zoom • Select a Planet</p>
   </div>
+  <div class="planet-bar" id="planetBar"></div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
